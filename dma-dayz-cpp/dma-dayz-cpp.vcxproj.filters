@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dma-dayz-cpp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\DayZMem\DayZMem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\DayzUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\DayZMem\MemoryUpdater\MemoryUpdater.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\DayZMem\OverlayAdapter\OverlayAdapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\Maps\ChernarusPlus.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\DayZMem\RadarAdapter\RadarAdapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\Maps\Namalsk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\Maps\Livonia.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\Maps\DeadFall.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\Maps\Alteria.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\Maps\Lux.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\Maps\Esseker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\Maps\Deerisle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\Maps\Sakhal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\Maps\Banov.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DayZ\Structs\ArmaString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Structs\ScoreboardIdentity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Structs\Scoreboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Structs\NetworkClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Structs\NetworkManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\DayzUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Structs\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Structs\Entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Structs\EntityTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Structs\EntityType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Structs\FutureVisualState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Structs\WorldPointer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Structs\World.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\DayZMem\DayZMem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Structs\EntityTableSlowItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Structs\EntityInventory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Structs\InventoryItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Structs\EntityFilterList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Structs\WorldNoLists.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\DayZMem\MemoryUpdater\MemoryUpdater.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\DayZMem\OverlayAdapter\OverlayAdapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Maps\ChernarusPlus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\DayZMem\RadarAdapter\RadarAdapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Maps\Namalsk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Maps\Livonia.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Maps\DeadFall.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Maps\Esseker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Maps\Deerisle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Maps\Sakhal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Maps\Banov.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Maps\Alteria.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Maps\Lux.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="notes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="mapcontent\chernarusplus.png">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="mapcontent\namalsk.png">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="mapcontent\livonia.png">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+  </ItemGroup>
+</Project>
