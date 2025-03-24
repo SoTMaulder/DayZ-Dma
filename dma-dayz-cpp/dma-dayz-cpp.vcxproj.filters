@@ -63,6 +63,9 @@
     <ClCompile Include="DayZ\Maps\Banov.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DayZ\Maps\Takistan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DayZ\Structs\ArmaString.h">
@@ -159,6 +162,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DayZ\Maps\Lux.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Maps\Takistan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

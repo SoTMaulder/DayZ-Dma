@@ -20,6 +20,7 @@
 #include "DayZ/Maps/Deerisle.h"
 #include "DayZ/Maps/Sakhal.h"
 #include "DayZ/Maps/Banov.h"
+#include "DayZ/Maps/Takistan.h"
 
 int main()
 {
@@ -44,6 +45,7 @@ int main()
     cmd.getBridge()->addMap(std::shared_ptr<DayZ::Deerisle>(new DayZ::Deerisle()));
     cmd.getBridge()->addMap(std::shared_ptr<DayZ::Sakhal>(new DayZ::Sakhal()));
     cmd.getBridge()->addMap(std::shared_ptr<DayZ::Banov>(new DayZ::Banov()));
+    cmd.getBridge()->addMap(std::shared_ptr<DayZ::Takistan>(new DayZ::Takistan()));
 
     cmd.getBridge()->setRadar(std::shared_ptr<DayZ::RadarAdapter>(new DayZ::RadarAdapter(memUpdater.get())));
 
