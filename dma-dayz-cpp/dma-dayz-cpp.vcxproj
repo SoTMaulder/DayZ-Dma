@@ -216,6 +216,23 @@
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\maps</DestinationFolders>
     </CopyFileToFolders>
   </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="mapcontent\alteria.png">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\maps</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="mapcontent\banov.png">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\maps</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="mapcontent\deadfall.png">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\maps</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="mapcontent\sakhal.png">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\maps</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="mapcontent\takistan.png">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\maps</DestinationFolders>
+    </CopyFileToFolders>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
