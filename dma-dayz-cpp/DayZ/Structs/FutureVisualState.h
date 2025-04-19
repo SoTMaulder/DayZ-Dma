@@ -12,7 +12,7 @@ namespace DayZ {
 
 
 		FutureVisualState() {
-			this->registerOffset(0x2c, &position, sizeof(DMARender::Vector3));
+			this->registerOffset(0x2C, &position, sizeof(DMARender::Vector3));
 			this->registerOffset(0x20, &dirX, sizeof(float));
 			this->registerOffset(0x28, &dirY, sizeof(float));
 		}

@@ -11,10 +11,16 @@ VMM_HANDLE DMAMem::VmmManager::getVmm() {
 VMM_HANDLE DMAMem::VmmManager::initialize()
 {
 	VMMDLL_CloseAll();
-	LPSTR args[] = { LPSTR(""), LPSTR("-device"), LPSTR("fpga") };
+	std::cout << " [ + ] Connecting to DMA Card..." << std::endl;
+
+	LPSTR args[] = { LPSTR(""), LPSTR("-device"), LPSTR("fpga://algo=0") };
+
 	VMM_HANDLE handle = VMMDLL_Initialize(3, args);
 	if (!handle)
-		std::cout << "FAIL:    VMMDLL_Initialize\n" << std::endl;
+		std::cout << "[ ! ] Vmm Initialization Failed..." << std::endl;
+
+	std::cout << " [ + ] Connected to DMA Card..." << std::endl;
+
 	return handle;
 }
 

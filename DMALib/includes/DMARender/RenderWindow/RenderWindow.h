@@ -38,6 +38,13 @@ namespace DMARender {
 
         //Fonts
         ImFont* windowIdentifyFont;
+        //Fonts
+        //ImFont* menufont;
+        //ImFont* lootFontFar;
+        //ImFont* lootFontFarFar;
+        ImFont* playerFont;
+
+
 
         void drawOverlayHandler();
         void drawMapHandler();

@@ -33,8 +33,14 @@ void DMARender::IOverlay::drawBoundingBox(const Vector2& top, const Vector2& bot
 			ImVec2(p.x + top.x + width / 2, p.y + top.y)
 	};
 
-	drawList->AddPolyline(tmpLineOrder, 5, color, 0, 1);
+	drawList->AddPolyline(tmpLineOrder,
+		5,
+		color,
+		0,
+		1);
 }
+
+
 
 void DMARender::IOverlay::drawFilledCircle(const Vector2& point, const float& radius, const ImU32& color) {
 	auto drawList = ImGui::GetWindowDrawList();

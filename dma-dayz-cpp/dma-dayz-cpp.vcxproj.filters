@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Maps">
+      <UniqueIdentifier>{3f8f3edd-a3dd-431a-81ec-da8e3b76f3d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\map">
+      <UniqueIdentifier>{69417ab2-a97f-40b2-8ceb-84c44ce36952}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dma-dayz-cpp.cpp">
@@ -30,41 +36,44 @@
     <ClCompile Include="DayZ\DayZMem\OverlayAdapter\OverlayAdapter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DayZ\Maps\ChernarusPlus.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DayZ\DayZMem\RadarAdapter\RadarAdapter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DayZ\Maps\Namalsk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DayZ\Maps\Livonia.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DayZ\Maps\DeadFall.cpp">
+    <ClCompile Include="DayZ\Structs\Entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DayZ\Maps\Alteria.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\map</Filter>
     </ClCompile>
-    <ClCompile Include="DayZ\Maps\Lux.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="DayZ\Maps\ChernarusPlus.cpp">
+      <Filter>Source Files\map</Filter>
     </ClCompile>
-    <ClCompile Include="DayZ\Maps\Esseker.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="DayZ\Maps\DeadFall.cpp">
+      <Filter>Source Files\map</Filter>
     </ClCompile>
     <ClCompile Include="DayZ\Maps\Deerisle.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\Maps\Esseker.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\Maps\Livonia.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\Maps\Lux.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\Maps\Namalsk.cpp">
+      <Filter>Source Files\map</Filter>
     </ClCompile>
     <ClCompile Include="DayZ\Maps\Sakhal.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DayZ\Maps\Banov.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\map</Filter>
     </ClCompile>
     <ClCompile Include="DayZ\Maps\Takistan.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="DayZ\Maps\Banov.cpp">
+      <Filter>Source Files\map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -131,45 +140,48 @@
     <ClInclude Include="DayZ\DayZMem\OverlayAdapter\OverlayAdapter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DayZ\Maps\ChernarusPlus.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DayZ\DayZMem\RadarAdapter\RadarAdapter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DayZ\Maps\Namalsk.h">
+    <ClInclude Include="Skeleton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DayZ\Maps\Livonia.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="DayZ\Maps\ChernarusPlus.h">
+      <Filter>Header Files\Maps</Filter>
     </ClInclude>
     <ClInclude Include="DayZ\Maps\DeadFall.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DayZ\Maps\Esseker.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Maps</Filter>
     </ClInclude>
     <ClInclude Include="DayZ\Maps\Deerisle.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Maps</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Maps\Esseker.h">
+      <Filter>Header Files\Maps</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Maps\Livonia.h">
+      <Filter>Header Files\Maps</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Maps\Namalsk.h">
+      <Filter>Header Files\Maps</Filter>
     </ClInclude>
     <ClInclude Include="DayZ\Maps\Sakhal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DayZ\Maps\Banov.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Maps</Filter>
     </ClInclude>
     <ClInclude Include="DayZ\Maps\Alteria.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Maps</Filter>
     </ClInclude>
     <ClInclude Include="DayZ\Maps\Lux.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Maps</Filter>
     </ClInclude>
     <ClInclude Include="DayZ\Maps\Takistan.h">
+      <Filter>Header Files\Maps</Filter>
+    </ClInclude>
+    <ClInclude Include="DayZ\Maps\Banov.h">
+      <Filter>Header Files\Maps</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="notes.txt" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="mapcontent\chernarusplus.png">
@@ -181,10 +193,10 @@
     <CopyFileToFolders Include="mapcontent\livonia.png">
       <Filter>Resource Files</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="mapcontent\banov.png">
+    <CopyFileToFolders Include="mapcontent\alteria.png">
       <Filter>Resource Files</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="mapcontent\alteria.png">
+    <CopyFileToFolders Include="mapcontent\banov.png">
       <Filter>Resource Files</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="mapcontent\deadfall.png">
@@ -196,5 +208,15 @@
     <CopyFileToFolders Include="mapcontent\takistan.png">
       <Filter>Resource Files</Filter>
     </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="dma-dayz-cpp.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="53ac2d01e41ff949c11c916309ae17b7.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -1,7 +1,10 @@
 #include "RenderWindow.h"
+//#include <iostream>
+
+ImVec2 g_mainPlayerScreenPos = ImVec2(0, 0);
+ImVec2 g_mainPlayerScreenPosBuffered = ImVec2(0, 0);
 
 std::map<HWND, DMARender::RenderWindow*> DMARender::hwndMap = std::map<HWND, DMARender::RenderWindow*>();
-
 void DMARender::RenderWindow::drawOverlayHandler()
 {
     static bool identifyWindows = false;
@@ -9,100 +12,373 @@ void DMARender::RenderWindow::drawOverlayHandler()
     auto pIO = ImGui::GetPlatformIO();
     static int monitor_current_idx = 0;
     ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
-    ImGui::Begin("Overlay Handler", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize);
-    if (overlayEnabled) {
-        auto io = ImGui::GetIO();
-        ImGui::Text("FPS: %.1f FPS", io.Framerate);
-        if (ImGui::Button("Disable Overlay"))
-            overlayEnabled = false;
-    }
-    else {
-        ImGui::Checkbox("Identify Windows", &identifyWindows);
-        std::string comboPreview = std::format("Window {}", monitor_current_idx);
+    ImGui::Begin("Fuser Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize);
 
-        if (ImGui::BeginCombo("Overlay Monitor", comboPreview.c_str())) {
-            for (int i = 0; i < pIO.Monitors.size(); i++) {
-                auto pMonitor = pIO.Monitors[i];
-                const bool isSelected = (monitor_current_idx == i);
-                auto monitorName = std::format("Monitor {}", i);
-                if (ImGui::Selectable(monitorName.c_str(), isSelected)) {
-                    monitor_current_idx = i;
+
+    static int selectedTab = 0;
+    static bool followPlayerEnabled = false;
+
+
+    // add tabs
+    if (ImGui::BeginTabBar("FuserTabs")) {
+        // ESP tab
+        if (ImGui::BeginTabItem("Fuser")) {
+            selectedTab = 0;
+
+            if (identifyWindows) {
+                for (int i = 0; i < pIO.Monitors.size(); i++) {
+                    auto pMonitor = pIO.Monitors[i];
+                    ImGui::SetNextWindowPos(ImVec2(pMonitor.MainPos.x + 40, pMonitor.MainPos.y + 40));
+                    ImGui::SetNextWindowSize(ImVec2(150, 250));
+                    auto windowName = std::format("{}", i);
+                    ImGui::Begin(windowName.c_str(), nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar);
+
+                    auto drawList = ImGui::GetWindowDrawList();
+                    auto p = ImGui::GetCursorScreenPos();
+
+                    ImGui::PushFont(windowIdentifyFont);
+                    drawList->AddText(ImGui::GetFont(), ImGui::GetFontSize(), ImVec2(p.x, p.y), IM_COL32(255, 0, 0, 255), windowName.c_str());
+                    ImGui::PopFont();
+                    ImGui::End();
                 }
-                if (isSelected)
-                    ImGui::SetItemDefaultFocus();
             }
-            ImGui::EndCombo();
+
+            if (overlayEnabled) {
+                auto io = ImGui::GetIO();
+                ImGui::Text("FPS: %.1f FPS", io.Framerate);
+                if (ImGui::Button("Disable ESP"))
+                    overlayEnabled = false;
+
+
+                bool showPlayerInfoesp = bridge->shouldShowPlayerInfoesp();
+                bool showZombiesFUSER = bridge->shouldShowZombiesFUSER();
+                bool showAnimalsFUSER = bridge->shouldShowAnimalsFUSER();
+                bool showVehiclesFUSER = bridge->shouldShowVehiclesFUSER();
+                bool showBoatsFUSER = bridge->shouldShowBoatsFUSER();
+                bool showDebugFUSER = bridge->shouldShowDebugFUSER();
+                int ZombieDistanceFUSER = bridge->shouldZombieDistanceFUSER();
+                int LootDebugDistance = bridge->shouldLootDebugDistance();
+                std::string followPlayerName = bridge->shouldPlayerName();
+
+
+                ImGui::InputText("Name", &followPlayerName, sizeof(followPlayerName));
+                ImGui::Checkbox("Name, Dist, Hand", &showPlayerInfoesp);
+                ImGui::Checkbox("Zombie Box", &showZombiesFUSER);
+                if (showZombiesFUSER) {
+                    ImGui::SliderInt("Z Dist", &ZombieDistanceFUSER, 1, 300);
+                }
+                ImGui::Checkbox("Animals", &showAnimalsFUSER);
+                ImGui::Checkbox("Cars", &showVehiclesFUSER);
+                ImGui::Checkbox("Boats", &showBoatsFUSER);
+                ImGui::Checkbox("Debug Info", &showDebugFUSER);
+                if (showDebugFUSER) {
+                    ImGui::SliderInt("D Dist", &LootDebugDistance, 1, 300);
+                }
+                bridge->setShowPlayerInfoesp(showPlayerInfoesp);
+                bridge->setShowZombiesFUSER(showZombiesFUSER);
+                bridge->setShowAnimalsFUSER(showAnimalsFUSER);
+                bridge->setShowVehiclesFUSER(showVehiclesFUSER);
+                bridge->setShowBoatsFUSER(showBoatsFUSER);
+                bridge->setShowDebugFUSER(showDebugFUSER);
+                bridge->setZombieDistance(ZombieDistanceFUSER);
+                bridge->setLootDebugDistance(LootDebugDistance);
+                bridge->setShowPlayerName(followPlayerName);
+
+            }
+            else {
+                ImGui::Checkbox("Identify Windows", &identifyWindows);
+                std::string comboPreview = std::format("Window {}", monitor_current_idx);
+
+                if (ImGui::BeginCombo("Overlay Monitor", comboPreview.c_str())) {
+                    for (int i = 0; i < pIO.Monitors.size(); i++) {
+                        auto pMonitor = pIO.Monitors[i];
+                        const bool isSelected = (monitor_current_idx == i);
+                        auto monitorName = std::format("Monitor {}", i);
+                        if (ImGui::Selectable(monitorName.c_str(), isSelected)) {
+                            monitor_current_idx = i;
+                        }
+                        if (isSelected)
+                            ImGui::SetItemDefaultFocus();
+                    }
+                    ImGui::EndCombo();
+                }
+                ImGui::Text("Selected Resolution: %.0fx%.0f", pIO.Monitors[monitor_current_idx].MainSize.x, pIO.Monitors[monitor_current_idx].MainSize.y);
+                if (ImGui::Button("Start ESP")) {
+                    overlayEnabled = true;
+                    identifyWindows = false;
+                }
+            }
+            //ImGui::End();
+
+            ImGui::EndTabItem();
         }
-        ImGui::Text("Selected Resolution: %.0fx%.0f", pIO.Monitors[monitor_current_idx].MainSize.x, pIO.Monitors[monitor_current_idx].MainSize.y);
-        if (ImGui::Button("Begin Overlay")) {
-            overlayEnabled = true;
-            identifyWindows = false;
+
+        // Playerlist Tab
+        if (ImGui::BeginTabItem("Loot")) {
+            selectedTab = 1;
+
+            bool showDeadPlayersFUSER = bridge->shouldShowDeadPlayersFUSER();
+            bool showDeadAnimalsFUSER = bridge->shouldShowDeadAnimalsFUSER();
+            bool showBackpacksFUSER = bridge->shouldShowBackpacksFUSER();
+            bool showClothingFUSER = bridge->shouldShowClothingFUSER();
+            bool showOpticsFUSER = bridge->shouldShowOpticsFUSER();
+            bool showExplosivesFUSER = bridge->shouldShowExplosivesFUSER();
+            bool showWeaponsFUSER = bridge->shouldShowWeaponsFUSER();
+            bool showMeleeFUSER = bridge->shouldShowMeleeFUSER();
+            bool showProxyMagazinesFUSER = bridge->shouldShowProxyMagazinesFUSER();
+            bool showAmmoFUSER = bridge->shouldShowAmmoFUSER();
+            bool showFoodFUSER = bridge->shouldShowFoodFUSER();
+            bool showGrounditemsFUSER = bridge->shouldShowGrounditemsFUSER();
+            bool showRareFUSER = bridge->shouldShowRareFUSER();
+            int showItemDistance = bridge->shouldlootDistanceFUSER();
+            bool showBaseFUSER = bridge->shouldShowBaseFUSER();
+
+
+            ImGui::Text("Loot");
+            ImGui::Checkbox("Dead Players", &showDeadPlayersFUSER);
+            ImGui::Checkbox("Dead Animals", &showDeadAnimalsFUSER);
+            ImGui::Checkbox("Backpacks", &showBackpacksFUSER);
+            ImGui::Checkbox("Clothing", &showClothingFUSER);
+            ImGui::Checkbox("Optics", &showOpticsFUSER);
+            ImGui::Checkbox("Explosives", &showExplosivesFUSER);
+            ImGui::Checkbox("Weapons", &showWeaponsFUSER);
+            ImGui::Checkbox("Melee", &showMeleeFUSER);
+            ImGui::Checkbox("Proxy Magazines", &showProxyMagazinesFUSER);
+            ImGui::Checkbox("Ammo", &showAmmoFUSER);
+            ImGui::Checkbox("Food", &showFoodFUSER);
+            ImGui::Checkbox("Ground Items", &showGrounditemsFUSER);
+            ImGui::Checkbox("Base Items", &showBaseFUSER);
+            ImGui::Checkbox("Rare (rareitems.txt)", &showRareFUSER);
+            ImGui::SliderInt("Distance", &showItemDistance, 1.0, 170);
+
+
+
+            bridge->setShowDeadPlayersFUSER(showDeadPlayersFUSER);
+            bridge->setShowDeadAnimalsFUSER(showDeadAnimalsFUSER);
+            bridge->setShowBackpacksFUSER(showBackpacksFUSER);
+            bridge->setShowClothingFUSER(showClothingFUSER);
+            bridge->setShowOpticsFUSER(showOpticsFUSER);
+            bridge->setShowExplosivesFUSER(showExplosivesFUSER);
+            bridge->setShowWeaponsFUSER(showWeaponsFUSER);
+            bridge->setShowMeleeFUSER(showMeleeFUSER);
+            bridge->setShowProxyMagazinesFUSER(showProxyMagazinesFUSER);
+            bridge->setShowAmmoFUSER(showAmmoFUSER);
+            bridge->setShowFoodFUSER(showFoodFUSER);
+            bridge->setShowGrounditemsFUSER(showGrounditemsFUSER);
+            bridge->setShowBaseFUSER(showBaseFUSER);
+            bridge->setShowRareFUSER(showRareFUSER);
+            bridge->setlootDistance(showItemDistance);
+
+
+
+
         }
+        ImGui::EndTabItem();
     }
-    ImGui::End();
 
-    if (identifyWindows) {
-        for (int i = 0; i < pIO.Monitors.size(); i++) {
-            auto pMonitor = pIO.Monitors[i];
-            ImGui::SetNextWindowPos(ImVec2(pMonitor.MainPos.x + 40, pMonitor.MainPos.y + 40));
-            ImGui::SetNextWindowSize(ImVec2(150, 250));
-            auto windowName = std::format("{}", i);
-            ImGui::Begin(windowName.c_str(), nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar);
-
-            auto drawList = ImGui::GetWindowDrawList();
-            auto p = ImGui::GetCursorScreenPos();
-
-            ImGui::PushFont(windowIdentifyFont);
-            drawList->AddText(ImGui::GetFont(), ImGui::GetFontSize(), ImVec2(p.x, p.y), IM_COL32(255, 0, 0, 255), windowName.c_str());
-            ImGui::PopFont();
-            ImGui::End();
-        }
-    }
+    ImGui::EndTabBar();
 
     if (overlayEnabled) {
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
         auto selectedMonitor = pIO.Monitors[monitor_current_idx];
         ImGui::SetNextWindowSize(ImVec2(selectedMonitor.MainSize.x, selectedMonitor.MainSize.y));
         ImGui::SetNextWindowPos((ImVec2(selectedMonitor.MainPos.x, selectedMonitor.MainPos.y)));
-        ImGui::Begin("ESP Overlay", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration);
+        ImGui::Begin("ESP", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration);
         this->bridge->getOverlay()->DrawOverlay();
         ImGui::End();
     }
 }
 
-void DMARender::RenderWindow::drawMapHandler()
-{
-
-    //Map Selection
+void DMARender::RenderWindow::drawMapHandler() {
+    // Map Selection and Radar Setup
     auto maps = bridge->getMapManager()->getMaps();
     if (maps.size() == 0)
         return;
     static int map_current_index = 0;
     static MapTransform mTrans = MapTransform();
-    ImGui::Begin("Radar", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize);
-    if (bridge->getMapManager()->isMapSelected()) {
-        if (ImGui::Button("Stop Radar"))
-            bridge->getMapManager()->clearMap();
-    }
-    else {
-        auto previewString = maps[map_current_index]->getName();
-        if (ImGui::BeginCombo("Selected Map", previewString.c_str())) {
-            for (int i = 0; i < maps.size(); i++) {
-                bool isSelected = i == map_current_index;
-                if (ImGui::Selectable(maps[i]->getName().c_str(), isSelected))
-                    map_current_index = i;
+
+    ImGui::Begin("Radar Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize);
+
+    static int selectedTab = 0;
+    static bool followPlayerEnabled = false;
+
+
+    // add tabs
+    if (ImGui::BeginTabBar("RadarTabs")) {
+        // ESP tab
+        if (ImGui::BeginTabItem("Radar")) {
+            selectedTab = 0;
+
+            if (bridge->getMapManager()->isMapSelected()) {
+                if (ImGui::Button("Stop Radar"))
+                    bridge->getMapManager()->clearMap();
+            }
+            else {
+                auto previewString = maps[map_current_index]->getName();
+                if (ImGui::BeginCombo("Map", previewString.c_str())) {
+                    for (int i = 0; i < maps.size(); i++) {
+                        bool isSelected = i == map_current_index;
+                        if (ImGui::Selectable(maps[i]->getName().c_str(), isSelected))
+                            map_current_index = i;
+                    }
+                    ImGui::EndCombo();
+                }
+                if (ImGui::Button("Start Radar")) {
+                    mTrans.mapZoom = 0.3;
+                    mTrans.dragOffsetX = 0;
+                    mTrans.dragOffsetY = 0;
+                    bridge->getMapManager()->selectMap(map_current_index);
+                }
             }
 
-            ImGui::EndCombo();
-        }
-        if (ImGui::Button("Start Radar")) {
-            mTrans.mapZoom = -1;
-            mTrans.dragOffsetX = 0;
-            mTrans.dragOffsetY = 0;
-            bridge->getMapManager()->selectMap(map_current_index);
+            // filter settings and checkbox
+            if (bridge->getMapManager()->isMapSelected()) {
+                bool showVehicles = bridge->shouldShowVehicles();
+                bool showBoats = bridge->shouldShowBoats();
+                bool showZombies = bridge->shouldShowZombies();
+                bool showAnimals = bridge->shouldShowAnimals();
+                int ZombiesBlipSize = bridge->shouldZombiesBlipSize();
+                int AnimalsBlipSize = bridge->shouldAnimalsBlipSize();
+
+                std::string followPlayerName = bridge->shouldPlayerName();
+                int BlipSize = bridge->shouldBlipSize();
+                int Aimlinelength = bridge->shouldAimlinelength();
+
+                // fonts
+                int RadarFont = bridge->shouldRadarFont();
+
+                ImGui::Checkbox("Follow Player", &followPlayerEnabled);
+                ImGui::InputText("Name", &followPlayerName, sizeof(followPlayerName));
+                ImGui::SliderInt("P Blip", &BlipSize, 2, 15);
+                ImGui::SliderInt("Aimline", &Aimlinelength, 1, 100);
+                ImGui::SliderInt("P Font", &RadarFont, 10, 32);
+                ImGui::Checkbox("Zombies", &showZombies);
+                if (showZombies) {
+
+                    ImGui::SliderInt("Z Blip", &ZombiesBlipSize, 2, 15);
+
+                }
+                ImGui::Checkbox("Animals", &showAnimals);
+                if (showAnimals) {
+
+                    ImGui::SliderInt("A Blip", &AnimalsBlipSize, 2, 15);
+
+                }
+                ImGui::Checkbox("Cars", &showVehicles);
+                ImGui::Checkbox("Boats", &showBoats);
+                bridge->setShowVehicles(showVehicles);
+                bridge->setShowBoats(showBoats);
+                bridge->setShowZombies(showZombies);
+                bridge->setShowAnimals(showAnimals);
+                bridge->setShowPlayerName(followPlayerName);
+                bridge->setShowBlipSize(BlipSize);
+                bridge->setAimlinelength(Aimlinelength);
+                bridge->setZombiesBlipSize(ZombiesBlipSize);
+                bridge->setAnimalsBlipSize(AnimalsBlipSize);
+
+                // font
+                bridge->setRadarFont(RadarFont);
+            }
+            ImGui::EndTabItem();
         }
 
+        // Playerlist Tab
+        if (ImGui::BeginTabItem("Loot")) {
+            selectedTab = 1;
+
+            bool showDeadPlayers = bridge->shouldShowDeadPlayers();
+            bool showGrounditems = bridge->shouldShowGrounditems();
+            bool showDeadAnimals = bridge->shouldShowDeadAnimals();
+            bool showClothing = bridge->shouldShowClothing();
+            bool showExplosives = bridge->shouldShowExplosives();
+            bool showWeapons = bridge->shouldShowWeapons();
+            bool showMelee = bridge->shouldShowMelee();
+            bool showProxyMagazines = bridge->shouldShowProxyMagazines();
+            bool showBackpacks = bridge->shouldShowBackpacks();
+            bool showFood = bridge->shouldShowFood();
+            bool showAmmo = bridge->shouldShowAmmo();
+            bool showRare = bridge->shouldShowRare();
+            bool showBase = bridge->shouldShowBase();
+            bool showOptics = bridge->shouldShowOptics();
+            int LootDistanceDeadzone = bridge->shouldLootDistanceDeadzone();
+            int BlipSize2 = bridge->shouldBlipSize2();
+            int RadarFont2 = bridge->shouldRadarFont2();
+
+            ImGui::Text("Loot");
+            ImGui::Checkbox("Dead Players", &showDeadPlayers);
+            ImGui::Checkbox("Dead Animals", &showDeadAnimals);
+            ImGui::Checkbox("Backpacks", &showBackpacks);
+            ImGui::Checkbox("Clothing", &showClothing);
+            ImGui::Checkbox("Optics", &showOptics);
+            ImGui::Checkbox("Explosives", &showExplosives);
+            ImGui::Checkbox("Weapons", &showWeapons);
+            ImGui::Checkbox("Melee", &showMelee);
+            ImGui::Checkbox("Proxy Magazines", &showProxyMagazines);
+            ImGui::Checkbox("Ammo", &showAmmo);
+            ImGui::Checkbox("Food", &showFood);
+            ImGui::Checkbox("Ground Items", &showGrounditems);
+            ImGui::Checkbox("Base Items", &showBase);
+            ImGui::Checkbox("Rare (rareitems.txt)", &showRare);
+            ImGui::SliderInt("Loot Deadzone", &LootDistanceDeadzone, 0, 300);
+            ImGui::SliderInt("Loot Blip", &BlipSize2, 2, 15);
+            ImGui::SliderInt("Loot Font", &RadarFont2, 10, 32);
+
+            bridge->setShowDeadPlayers(showDeadPlayers);
+            bridge->setShowGrounditems(showGrounditems);
+            bridge->setShowDeadAnimals(showDeadAnimals);
+            bridge->setShowClothing(showClothing);
+            bridge->setShowExplosives(showExplosives);
+            bridge->setShowWeapons(showWeapons);
+            bridge->setShowMelee(showMelee);
+            bridge->setShowProxyMagazines(showProxyMagazines);
+            bridge->setShowBackpacks(showBackpacks);
+            bridge->setShowFood(showFood);
+            bridge->setShowAmmo(showAmmo);
+            bridge->setShowRare(showRare);
+            bridge->setShowBase(showBase);
+            bridge->setShowOptics(showOptics);
+            bridge->setLootDistanceDeadzone(LootDistanceDeadzone);
+            bridge->setShowBlipSize2(BlipSize2);
+            bridge->setRadarFont2(RadarFont2);
+
+
+            // filter settings and checkbox
+            //bool showPlayerList = bridge->shouldShowPlayerList();
+            //bool showServerPlayerList = bridge->shouldShowServerPlayerList();
+
+            //ImGui::Checkbox("Enable Player List", &showPlayerList);
+            //ImGui::Checkbox("Enable Server Player List", &showServerPlayerList);
+
+            //ImGui::InputText("Player Name", &followPlayerName, sizeof(&followPlayerName));
+
+            //bridge->setName(followPlayerName);
+
+            //bridge->setShowPlayerList(showPlayerList);
+            //bridge->setShowServerPlayerList(showServerPlayerList);
+
+            ImGui::EndTabItem();
+        }
+        // Playerlist Tab
+        if (ImGui::BeginTabItem("Extra")) {
+            selectedTab = 2;
+
+            bool showPlayerList = bridge->shouldShowPlayerList();
+            bool showServerPlayerList = bridge->shouldShowServerPlayerList();
+
+            ImGui::Checkbox("Player List", &showPlayerList);
+            ImGui::Checkbox("Server Player List", &showServerPlayerList);
+
+            bridge->setShowPlayerList(showPlayerList);
+            bridge->setShowServerPlayerList(showServerPlayerList);
+
+
+            ImGui::EndTabItem();
+        }
+
+        ImGui::EndTabBar();
     }
-    ImGui::End();
+
+    ImGui::End(); // close mainwindow
 
     //Radar Logic
     if (!bridge->getMapManager()->isMapSelected())
@@ -153,6 +429,35 @@ void DMARender::RenderWindow::drawMapHandler()
     lastMousePosX = mousePos.x;
     lastMousePosY = mousePos.y;
 
+    // **Update gepufferte Spielerposition vor Nutzung**
+    g_mainPlayerScreenPosBuffered = g_mainPlayerScreenPos;
+
+    // Falls Follow Player aktiviert ist, passe mTrans basierend auf der Fenstergröße an
+    if (followPlayerEnabled) {
+        float winWidth = static_cast<float>(rect.right - rect.left);
+        float winHeight = static_cast<float>(rect.bottom - rect.top);
+        float centerX = winWidth / 2.0f;
+        float centerY = winHeight / 2.0f;
+
+      
+        float desiredOffsetX = centerX - g_mainPlayerScreenPosBuffered.x;
+        float desiredOffsetY = centerY - g_mainPlayerScreenPosBuffered.y;
+
+        // Debugging
+        //std::cout << "Fensterzentrum: (" << centerX << ", " << centerY << ")\n";
+        //std::cout << "MainPlayerPos (Buffered): (" << g_mainPlayerScreenPosBuffered.x << ", " << g_mainPlayerScreenPosBuffered.y << ")\n";
+        //std::cout << "Gewünschter Offset: (" << desiredOffsetX << ", " << desiredOffsetY << ")\n";
+        //std::cout << "Aktueller Offset: (" << mTrans.dragOffsetX << ", " << mTrans.dragOffsetY << ")\n";
+
+        // Schwellwert: nur anpassen, wenn der Unterschied größer als z. B. 5 Pixel ist
+        const float threshold = 5.0f;
+        if (fabs(desiredOffsetX - mTrans.dragOffsetX) > threshold) {
+            mTrans.dragOffsetX = desiredOffsetX;
+        }
+        if (fabs(desiredOffsetY - mTrans.dragOffsetY) > threshold) {
+            mTrans.dragOffsetY = desiredOffsetY;
+        }
+    }
 
 
     ImDrawList* fgDrawList = ImGui::GetBackgroundDrawList();
@@ -190,7 +495,7 @@ void DMARender::RenderWindow::initializeWindow()
 
     WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, DMARender::WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"ImGui Example", nullptr };
     ::RegisterClassExW(&wc);
-    hwnd = ::CreateWindowW(wc.lpszClassName, L"DMA Commander",  WS_OVERLAPPEDWINDOW , 0, 0, 1280, 720, nullptr, nullptr, wc.hInstance, nullptr);
+    hwnd = ::CreateWindowW(wc.lpszClassName, L"DayZ-DMA-Radar",  WS_OVERLAPPEDWINDOW, 0, 0, 1600, 900, nullptr, nullptr, wc.hInstance, nullptr);
     DMARender::hwndMap[hwnd] = this;
 
     // Initialize Direct3D
@@ -202,7 +507,7 @@ void DMARender::RenderWindow::initializeWindow()
     }
 
     // Show the window
-    ::ShowWindow(hwnd, SW_SHOWDEFAULT);
+    ::ShowWindow(hwnd, SW_MAXIMIZE);
     ::UpdateWindow(hwnd);
 
     // Setup Dear ImGui context
@@ -215,13 +520,7 @@ void DMARender::RenderWindow::initializeWindow()
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
     //io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
-    //io.ConfigViewportsNoAutoMerge = true;
-    //io.ConfigViewportsNoTaskBarIcon = true;
-    //io.ConfigViewportsNoDefaultParent = true;
-    //io.ConfigDockingAlwaysTabBar = true;
-    //io.ConfigDockingTransparentPayload = true;
-    //io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleFonts;     // FIXME-DPI: Experimental. THIS CURRENTLY DOESN'T WORK AS EXPECTED. DON'T USE IN USER APP!
-    //io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleViewports; // FIXME-DPI: Experimental.
+
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -241,26 +540,12 @@ void DMARender::RenderWindow::initializeWindow()
     *g_pd3dDevicePtr = g_pd3dDevice;
 
 
-    // Load Fonts
-    // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-    // - If the file cannot be loaded, the function will return a nullptr. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-    // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-    // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
-    // - Read 'docs/FONTS.md' for more instructions and details.
-    // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-    //io.Fonts->AddFontDefault();
-    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-    //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
-    //IM_ASSERT(font != nullptr);
+
 
     // Our state
     bool show_demo_window = true;
     bool show_another_window = false;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 0.00f);
 
     // Main loop
     bool done = false;
@@ -409,11 +694,7 @@ void DMARender::RenderWindow::CreateFonts()
 // Forward declare message handler from imgui_impl_win32.cpp
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-// Win32 message handler
-// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
-// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
-// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
+
 LRESULT WINAPI DMARender::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))

@@ -178,6 +178,7 @@
     <ClInclude Include="includes\DMARender\IOverlay\IOverlay.h" />
     <ClInclude Include="includes\DMARender\Vectors\Vector2.h" />
     <ClInclude Include="includes\DMARender\Vectors\Vector3.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DMALib.cpp" />
@@ -203,6 +204,10 @@
     <ClCompile Include="includes\DMARender\Vectors\Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Library Include="libs\leechcore.lib" />
+    <Library Include="libs\vmm.lib" />
+  </ItemGroup>
+  <ItemGroup>
     <CopyFileToFolders Include="libs\FTD3XX.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
@@ -214,8 +219,26 @@
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="libs\leechcore.lib" />
-    <Library Include="libs\vmm.lib" />
+    <CopyFileToFolders Include="libs\dbghelp.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="libs\info.db">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="libs\symsrv.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DMALib.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\dma-dayz-cpp\53ac2d01e41ff949c11c916309ae17b7.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="libs\symsrv.yes">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

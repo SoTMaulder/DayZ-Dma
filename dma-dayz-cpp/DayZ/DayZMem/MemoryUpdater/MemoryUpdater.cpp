@@ -3,7 +3,7 @@
 void DayZ::MemoryUpdater::scoreboardWorker()
 {
 	while (threadRunning) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		auto newScoreboard = this->mem->getNetworkManager().NetworkClientPtr->scoreboardPtr;
 		const std::lock_guard<std::mutex> lock(scoreboardMutex);
 		this->scoreboard = newScoreboard;
@@ -13,6 +13,7 @@ void DayZ::MemoryUpdater::scoreboardWorker()
 void DayZ::MemoryUpdater::nearTableWorker()
 {
 	while (threadRunning) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		auto wnl = getWNL();
 		auto newNearEntity = std::shared_ptr<EntityTable>(new EntityTable(wnl.NearEntityTableCount));
 		newNearEntity->resolveObject(mem->getVMM(), mem->getPid(), wnl.NearTableAddress);
@@ -24,6 +25,7 @@ void DayZ::MemoryUpdater::nearTableWorker()
 void DayZ::MemoryUpdater::farTableWorker()
 {
 	while (threadRunning) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		auto wnl = getWNL();
 		auto newFarEntity = std::shared_ptr<EntityTable>(new EntityTable(wnl.FarEntityTableCount));
 		newFarEntity->resolveObject(mem->getVMM(), mem->getPid(), wnl.FarTableAddress);
@@ -35,7 +37,7 @@ void DayZ::MemoryUpdater::farTableWorker()
 void DayZ::MemoryUpdater::slowTableWorker()
 {
 	while (threadRunning) {
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		auto wnl = getWNL();
 		auto newSlowEntity = std::shared_ptr<EntityTableSlowItem>(new EntityTableSlowItem(wnl.SlowEntityCountAlloc, wnl.SlowEntityValidCount));
 		newSlowEntity->resolveObject(mem->getVMM(), mem->getPid(), wnl.SlowTableAddress);
@@ -47,7 +49,7 @@ void DayZ::MemoryUpdater::slowTableWorker()
 void DayZ::MemoryUpdater::itemTableWorker()
 {
 	while (threadRunning) {
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		auto wnl = getWNL();
 		auto newItemEntity = std::shared_ptr<EntityTableSlowItem>(new EntityTableSlowItem(wnl.ItemTableCountAlloc, wnl.ItemTableCount));
 		newItemEntity->resolveObject(mem->getVMM(), mem->getPid(), wnl.ItemTableAddress);

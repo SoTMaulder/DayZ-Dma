@@ -19,28 +19,15 @@ namespace DayZ {
 			this->registerPointer(0x4F0, CleanName.get());
 		}
 
-		bool isInvalidCleanName(const std::shared_ptr<ArmaString>& cleanName) const {
-			std::string cleanStr(cleanName->value);
-			return cleanStr.find("dayzinfected") != std::string::npos || cleanStr.find(".p3d") != std::string::npos;
-		}
-
 		std::shared_ptr<ArmaString> getBestString() {
-			if (TypeName && TypeName->length > 0 && TypeName->length < 400) {
-				return TypeName;
-			}
-
-			if (CleanName && CleanName->length > 0 && CleanName->length < 400 && !isInvalidCleanName(CleanName)) {
-				return CleanName;
-			}
-
-			if (ModelName && ModelName->length > 0 && ModelName->length < 400) {
-				return ModelName;
-			}
-
-			if (ConfigName && ConfigName->length > 0 && ConfigName->length < 400) {
-				return ConfigName;
-			}
-
+			if (this->CleanName->length > 0 && this->CleanName->length < 400)
+				return this->CleanName;
+			if (this->TypeName->length > 0 && this->TypeName->length < 400)
+				return this->TypeName;
+			if (this->ModelName->length > 0 && this->ModelName->length < 400)
+				return this->ModelName;
+			if (this->ConfigName->length > 0 && this->ConfigName->length < 400)
+				return this->ConfigName;
 			return nullptr;
 		}
 	};

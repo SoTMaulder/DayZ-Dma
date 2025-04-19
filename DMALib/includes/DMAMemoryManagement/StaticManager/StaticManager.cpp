@@ -24,10 +24,10 @@ DMAMem::MODULE_DUMP DMAMem::StaticManager::getModule(DWORD pid, std::string modu
 	dumpEntry.dump = std::shared_ptr<BYTE[]>(new BYTE[pModuleEntry->cbImageSize]);
 	bool success = vmmManager->readMemory(pid, pModuleEntry->vaBase, dumpEntry.dump.get(), pModuleEntry->cbImageSize, VMMDLL_FLAG_NOCACHE);
 	if (success) {
-		std::cout << "[+] Dumped " << moduleName << std::endl;
+		std::cout << " [ + ] Dumped " << moduleName << std::endl;
 	}
 	else {
-		std::cerr << "[-] Error Dumping " << moduleName << std::endl;
+		std::cerr << " [ ! ]  Error Dumping " << moduleName << std::endl;
 	}
 	dllMap[pair] = dumpEntry;
 	return dumpEntry;

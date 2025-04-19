@@ -19,8 +19,8 @@
 #include "DayZ/Maps/Esseker.h"
 #include "DayZ/Maps/Deerisle.h"
 #include "DayZ/Maps/Sakhal.h"
-#include "DayZ/Maps/Banov.h"
 #include "DayZ/Maps/Takistan.h"
+#include "DayZ/Maps/Banov.h"
 
 int main()
 {
@@ -34,7 +34,7 @@ int main()
 
     DMARender::RenderWindow cmd = DMARender::RenderWindow();
 
-    cmd.getBridge()->setOverlay(std::shared_ptr<DayZ::OverlayAdapter>(new DayZ::OverlayAdapter(memUpdater.get())));
+    cmd.getBridge()->setOverlay(std::make_shared<DayZ::OverlayAdapter>(memUpdater, cmd.getBridge()));
     cmd.getBridge()->addMap(std::shared_ptr<DayZ::ChernarusPlus>(new DayZ::ChernarusPlus()));
     cmd.getBridge()->addMap(std::shared_ptr<DayZ::Namalsk>(new DayZ::Namalsk()));
     cmd.getBridge()->addMap(std::shared_ptr<DayZ::Livonia>(new DayZ::Livonia()));
@@ -44,10 +44,10 @@ int main()
     cmd.getBridge()->addMap(std::shared_ptr<DayZ::Esseker>(new DayZ::Esseker()));
     cmd.getBridge()->addMap(std::shared_ptr<DayZ::Deerisle>(new DayZ::Deerisle()));
     cmd.getBridge()->addMap(std::shared_ptr<DayZ::Sakhal>(new DayZ::Sakhal()));
-    cmd.getBridge()->addMap(std::shared_ptr<DayZ::Banov>(new DayZ::Banov()));
     cmd.getBridge()->addMap(std::shared_ptr<DayZ::Takistan>(new DayZ::Takistan()));
+    cmd.getBridge()->addMap(std::shared_ptr<DayZ::Banov>(new DayZ::Banov()));
 
-    cmd.getBridge()->setRadar(std::shared_ptr<DayZ::RadarAdapter>(new DayZ::RadarAdapter(memUpdater.get())));
+    cmd.getBridge()->setRadar(std::make_shared<DayZ::RadarAdapter>(memUpdater, cmd.getBridge()));
 
     std::thread gfxThread(&DMARender::RenderWindow::initializeWindow, &cmd);
 

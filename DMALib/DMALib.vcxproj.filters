@@ -102,6 +102,9 @@
     <ClInclude Include="includes\DMARender\RenderWindow\MapTransform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DMALib.cpp">
@@ -176,5 +179,19 @@
     <CopyFileToFolders Include="libs\FTD3XX.dll" />
     <CopyFileToFolders Include="libs\leechcore.dll" />
     <CopyFileToFolders Include="libs\vmm.dll" />
+    <CopyFileToFolders Include="libs\dbghelp.dll" />
+    <CopyFileToFolders Include="libs\info.db" />
+    <CopyFileToFolders Include="libs\symsrv.dll" />
+    <CopyFileToFolders Include="libs\symsrv.yes" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DMALib.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\dma-dayz-cpp\53ac2d01e41ff949c11c916309ae17b7.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
