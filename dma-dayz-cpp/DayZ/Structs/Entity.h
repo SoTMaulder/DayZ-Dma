@@ -146,7 +146,7 @@ namespace DayZ {
 			EntityTypePtr = std::shared_ptr<EntityType>(new EntityType());
 			InventoryPtr = std::shared_ptr<EntityInventory>(new EntityInventory());
 			this->registerPointer(0x180, EntityTypePtr.get());
-			this->registerPointer(0x120, FutureVisualStatePtr.get());
+			this->registerPointer(0x1C8, FutureVisualStatePtr.get()); // RenderVisualState
 			this->registerPointer(0x658, InventoryPtr.get());
 			this->registerOffset(0x6E4, &NetworkID, sizeof(uint32_t)); // dayzplayer id for scoreboard
 			this->registerOffset(0xE2, &isDead, sizeof(bool));
