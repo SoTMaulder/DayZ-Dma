@@ -1,0 +1,86 @@
+name: Deploy to GitHub Releases
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'Resources/**'
+      - 'src/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build & Deploy
+    if: github.repository_owner == 'sotmaulder' ## If you remove this change the Velopack packId from 'github.sotmaulder.eft' below.
+    runs-on: windows-latest
+    environment: production
+
+    steps:  
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Get version info
+        uses: dotnet/nbgv@master
+        id: nbgv
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Install Velopack CLI
+        run: |
+          dotnet tool install -g vpk
+
+      - name: Dotnet Publish
+        run: |
+          dotnet publish dma-dayz-cpp.sln `
+            -c Release `
+            -r win-x64 `
+            --self-contained `
+            /p:DebugType=None `
+            /p:DebugSymbols=false `
+            /p:Version=${{ steps.nbgv.outputs.SemVer2 }} `
+            /p:FileVersion=${{ steps.nbgv.outputs.AssemblyFileVersion }} `
+            /p:AssemblyVersion=${{ steps.nbgv.outputs.AssemblyVersion }} `
+            -o out
+
+      - name: Download previous release data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          vpk download github `
+            --repoUrl "https://github.com/${{ github.repository }}" `
+            --token "$env:GITHUB_TOKEN"
+
+      - name: Pack with Velopack
+        run: |
+          vpk pack `
+            --packId github.sotmaulder.dayz `
+            --packVersion "${{ steps.nbgv.outputs.SemVer2 }}" `
+            --packDir "out" `
+            --mainExe "DayZ-DMA.exe" `
+            --packTitle "SoTMaulder DayZ" `
+            --icon "Resources/lone-icon.ico"
+
+      - name: Upload to GitHub Releases
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          vpk upload github `
+            --repoUrl "https://github.com/${{ github.repository }}" `
+            --publish `
+            --releaseName "EFT ${{ steps.nbgv.outputs.SemVer2 }}" `
+            --tag "v${{ steps.nbgv.outputs.SemVer2 }}" `
+            --targetCommitish "${{ github.sha }}" `
+            --token "$env:GITHUB_TOKEN"
