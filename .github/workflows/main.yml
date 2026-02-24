@@ -2,8 +2,7 @@ name: Deploy to GitHub Releases
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
     paths:
       - 'Resources/**'
       - 'src/**'
@@ -19,11 +18,11 @@ concurrency:
 jobs:
   build:
     name: Build & Deploy
-    if: github.repository_owner == 'sotmaulder' ## If you remove this change the Velopack packId from 'github.sotmaulder.eft' below.
+    if: github.repository_owner == 'sotmaulder'
     runs-on: windows-latest
     environment: production
 
-    steps:  
+    steps:
       - name: Checkout
         uses: actions/checkout@v5
         with:
@@ -38,22 +37,19 @@ jobs:
         with:
           dotnet-version: "10.0.x"
 
-      - name: Install Velopack CLI
-        run: |
-          dotnet tool install -g vpk
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
 
-      - name: Dotnet Publish
+      - name: Install Velopack CLI
+        run: dotnet tool install -g vpk
+
+      - name: Build C++ Solution (MSBuild)
         run: |
-          dotnet publish dma-dayz-cpp.sln `
-            -c Release `
-            -r win-x64 `
-            --self-contained `
-            /p:DebugType=None `
-            /p:DebugSymbols=false `
-            /p:Version=${{ steps.nbgv.outputs.SemVer2 }} `
-            /p:FileVersion=${{ steps.nbgv.outputs.AssemblyFileVersion }} `
-            /p:AssemblyVersion=${{ steps.nbgv.outputs.AssemblyVersion }} `
-            -o out
+          msbuild dma-dayz-cpp.sln ^
+            /t:Build ^
+            /p:Configuration=Release ^
+            /p:Platform=x64 ^
+            /p:OutDir="$(Build.SourcesDirectory)\out\\"
 
       - name: Download previous release data
         env:
