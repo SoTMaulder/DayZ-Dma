@@ -62,7 +62,6 @@ jobs:
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
-          git fetch --prune --unshallow
           git remote set-url origin https://$env:PAT_TOKEN@github.com/${{ github.repository }}.git
           git tag ${{ steps.bump.outputs.new_tag }}
           git push origin ${{ steps.bump.outputs.new_tag }}
