@@ -1,29 +1,58 @@
 name: Build & Release DayZ-DMA
 
 on:
-  workflow_dispatch:   # manual trigger for now
+  push:
+    branches:
+      - main
+    paths:
+      - 'dma-dayz-cpp/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
+    name: Build & Deploy DayZ-DMA
     runs-on: windows-latest
-    env:
-      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+    environment: production
 
     steps:
       # 1️⃣ Checkout full repo
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      # 2️⃣ Setup MSBuild
+      # 2️⃣ Get version info
+      - name: Get version info
+        uses: dotnet/nbgv@master
+        id: nbgv
+
+      # 3️⃣ Setup MSBuild
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
 
-      # 3️⃣ Build solution (Release x64)
-      - name: Build Solution
-        run: msbuild dma-dayz-cpp.sln /p:Configuration=Release
+      # 4️⃣ Download mapcontent.rar
+      - name: Download MapContent
+        run: |
+          curl -L -o mapcontent.rar "https://github.com/SoTMaulder/DayZ-Dma/releases/download/MapRelease/mapcontent.rar"
 
-      # 4️⃣ Package EXE + mapcontent
+      # 5️⃣ Extract mapcontent into the correct folder
+      - name: Extract MapContent
+        run: |
+          choco install -y 7zip
+          7z x mapcontent.rar -aoa -o"dma-dayz-cpp"
+
+      # 6️⃣ Build C++ solution (Release x64)
+      - name: Build Solution
+        run: msbuild dma-dayz-cpp\dma-dayz-cpp.sln /p:Configuration=Release
+
+      # 7️⃣ Package EXE + mapcontent into ZIP
       - name: Package Build
         shell: powershell
         run: |
@@ -32,12 +61,11 @@ jobs:
           Copy-Item -Path ".\dma-dayz-cpp\mapcontent" -Destination ".\release\mapcontent" -Recurse -Force
           Compress-Archive -Path release\* -DestinationPath DayZ-DMA.zip
 
-      # 5️⃣ Create GitHub Release (manual tag for now)
+      # 8️⃣ Upload ZIP to GitHub Release using auto version
       - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v0.0.1        # We will auto-bump later
-          name: "Release v0.0.1"
-          files: DayZ-DMA.zip
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create v${{ steps.nbgv.outputs.SemVer2 }} DayZ-DMA.zip `
+            --title "DayZ-DMA ${{ steps.nbgv.outputs.SemVer2 }}" `
+            --notes "Automated release from GitHub Actions."
