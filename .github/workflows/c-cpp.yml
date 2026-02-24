@@ -19,7 +19,7 @@ jobs:
       # Step 1: Download the map .rar
       - name: Download Map Content
         run: |
-          curl -L -o mapcontent.rar "https://www.mediafire.com/file/rdl3bs5lc8jk1ym/mapcontent.rar/file"
+          curl -L -o mapcontent.rar "https://download1072.mediafire.com/hzamk764g14g4CY74lptnU8O4gtMBOhEgsNYb-J7tvOZv_rGBNU-TkxJxYCMNpRbHEEyYdqw2CJsxqQ6oCYavjAmDG8k0xX72b3-xwtVntD96yllxXJsjedAxa15xG_UNVeeHEeU73qavOKhxNY0dY27ZuTU4G81By-AB4aWlwk/rdl3bs5lc8jk1ym/mapcontent.rar"
       
       # Step 2: Extract the .rar
       - name: Extract Map Content
