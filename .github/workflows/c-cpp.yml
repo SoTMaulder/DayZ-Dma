@@ -3,7 +3,7 @@ name: Build & Release DayZ-DMA
 on:
   push:
     branches:
-      - main  # Change if your default branch is different
+      - main  # change if your default branch is different
     paths:
       - 'dma-dayz-cpp/**'
   workflow_dispatch:
@@ -52,26 +52,29 @@ jobs:
       - name: Build Solution
         run: msbuild dma-dayz-cpp.sln /p:Configuration=Release
 
-      # 7️⃣ Package all build files + mapcontent into ZIP
+      # 7️⃣ Package EXE + mapcontent into ZIP
       - name: Package Build
         shell: powershell
         run: |
-          New-Item -ItemType Directory -Path "release" -Force
+          mkdir release
       
-          # Copy all files from x64\Release
-          Copy-Item -Path ".\x64\Release\*" -Destination ".\release" -Recurse -Force
+          # Copy all files and folders except "maps"
+          Get-ChildItem -Path ".\x64\Release" -Recurse -Force |
+            Where-Object { $_.PSIsContainer -eq $false -or $_.Name -ne "maps" } |
+            ForEach-Object {
+              $destination = ".\release\" + $_.FullName.Substring((Resolve-Path ".\x64\Release").Path.Length + 1)
+              $destDir = Split-Path $destination
+              if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
+              Copy-Item $_.FullName $destination -Force
+            }
       
           # Copy the mapcontent folder
           Copy-Item -Path ".\dma-dayz-cpp\mapcontent" -Destination ".\release\mapcontent" -Recurse -Force
       
-          # Create ZIP
-          Compress-Archive -Path release\* -DestinationPath DayZ-DMA.zip
+          # Compress into ZIP
+          Compress-Archive -Path release\* -DestinationPath DayZ-DMA.zip -Force
 
-      # 8️⃣ Install GitHub CLI
-      - name: Install GitHub CLI
-        run: choco install gh -y
-
-      # 9️⃣ Upload ZIP to GitHub Release
+      # 8️⃣ Upload ZIP to GitHub Release
       - name: Upload to GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
