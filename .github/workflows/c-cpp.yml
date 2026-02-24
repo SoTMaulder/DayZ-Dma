@@ -19,7 +19,7 @@ jobs:
       # ⭐ Download the map content .rar (use REAL direct link)
       - name: Download MapContent
         run: |
-          curl -L -o mapcontent.rar "https://download1072.mediafire.com/hzamk764g14g4CY74lptnU8O4gtMBOhEgsNYb-J7tvOZv_rGBNU-TkxJxYCMNpRbHEEyYdqw2CJsxqQ6oCYavjAmDG8k0xX72b3-xwtVntD96yllxXJsjedAxa15xG_UNVeeHEeU73qavOKhxNY0dY27ZuTU4G81By-AB4aWlwk/rdl3bs5lc8jk1ym/mapcontent.rar"
+          curl -L -o mapcontent.rar "https://download1072.mediafire.com/ctgm4ym6a7mgo_YQdGkXeWIisZbfyB5kxc39gT-YiP9w4mQ3rimku17WlN3Z0nGqzBOnXHQM8FT7ixb-IQxrOkDSfnV1FNmu2GiYtn1L2YsiCoxQUQcWyuZVgAFUuiX3inI9ntf-PW2eLLJdoq2Nic0Ly_cTIBTixhMo5jdGSq8/rdl3bs5lc8jk1ym/mapcontent.rar"
 
       # ⭐ Extract mapcontent into dma-dayz-cpp/ (not mapcontent/mapcontent)
       - name: Extract MapContent
