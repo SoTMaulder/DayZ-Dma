@@ -25,7 +25,7 @@ jobs:
       - name: Extract MapContent
         run: |
           choco install -y 7zip
-          7z x mapcontent.rar -o"dma-dayz-cpp"
+          7z x mapcontent.rar -aoa -o"dma-dayz-cpp"
 
       # ⭐ Build the Visual Studio solution
       - name: Build Solution
