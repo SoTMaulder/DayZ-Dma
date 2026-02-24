@@ -16,30 +16,29 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
 
-      # Step 1: Download the map .rar
-      - name: Download Map Content
+      # ⭐ Download the map content .rar (use REAL direct link)
+      - name: Download MapContent
         run: |
           curl -L -o mapcontent.rar "https://download1072.mediafire.com/hzamk764g14g4CY74lptnU8O4gtMBOhEgsNYb-J7tvOZv_rGBNU-TkxJxYCMNpRbHEEyYdqw2CJsxqQ6oCYavjAmDG8k0xX72b3-xwtVntD96yllxXJsjedAxa15xG_UNVeeHEeU73qavOKhxNY0dY27ZuTU4G81By-AB4aWlwk/rdl3bs5lc8jk1ym/mapcontent.rar"
-      
-      # Step 2: Extract the .rar
-      - name: Extract Map Content
+
+      # ⭐ Extract mapcontent into dma-dayz-cpp/ (not mapcontent/mapcontent)
+      - name: Extract MapContent
         run: |
           choco install -y 7zip
-          7z x mapcontent.rar -oMaps
+          7z x mapcontent.rar -o"dma-dayz-cpp"
 
-      # Step 3: Build your Visual Studio solution
+      # ⭐ Build the Visual Studio solution
       - name: Build Solution
         run: msbuild dma-dayz-cpp.sln /p:Configuration=Release
 
-      # Step 4: Package .exe + maps
+      # ⭐ Package the final .exe into a zip file
       - name: Package Build
         run: |
           mkdir release
           copy /Y "**\\Release\\*.exe" release
-          xcopy /E /I Maps release\Maps
           powershell Compress-Archive -Path release\* -DestinationPath DayZ-DMA.zip
 
-      # Step 5: Create GitHub Release
+      # ⭐ Upload the result as a GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
