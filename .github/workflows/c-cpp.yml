@@ -1,32 +1,82 @@
-name: Build & Release DayZ-Dma
+name: Build & Auto-Release DayZ-Dma
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main  # change if your main branch is different
+  workflow_dispatch:
 
 jobs:
   build_windows:
     runs-on: windows-latest
 
     steps:
+      # ---------------------------
+      # 1️⃣ Checkout repo
+      # ---------------------------
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # important: needed to see existing tags
 
+      # ---------------------------
+      # 2️⃣ Generate new version tag
+      # ---------------------------
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
+
+      - name: Bump patch version
+        id: bump
+        run: |
+          old="${{ steps.get_tag.outputs.latest_tag }}"
+          old="${old#v}"  # remove leading 'v'
+          IFS='.' read -r major minor patch <<< "$old"
+          patch=$((patch + 1))
+          new_tag="v$major.$minor.$patch"
+          echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
+
+      # ---------------------------
+      # 3️⃣ Push new tag to GitHub
+      # ---------------------------
+      - name: Push new tag
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git tag "${{ steps.bump.outputs.new_tag }}"
+          git push origin "${{ steps.bump.outputs.new_tag }}"
+
+      # ---------------------------
+      # 4️⃣ Setup MSBuild
+      # ---------------------------
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
 
+      # ---------------------------
+      # 5️⃣ Download mapcontent.rar
+      # ---------------------------
       - name: Download MapContent
         run: |
           curl -L -o mapcontent.rar "https://github.com/SoTMaulder/DayZ-Dma/releases/download/MapRelease/mapcontent.rar"
 
+      # ---------------------------
+      # 6️⃣ Extract mapcontent
+      # ---------------------------
       - name: Extract MapContent
         run: |
           choco install -y 7zip
           7z x mapcontent.rar -aoa -o"dma-dayz-cpp"
 
+      # ---------------------------
+      # 7️⃣ Build the solution
+      # ---------------------------
       - name: Build Solution
         run: msbuild dma-dayz-cpp.sln /p:Configuration=Release
 
+      # ---------------------------
+      # 8️⃣ Package EXE + mapcontent into ZIP
+      # ---------------------------
       - name: Package Build
         shell: powershell
         run: |
@@ -35,9 +85,14 @@ jobs:
           Copy-Item -Path ".\dma-dayz-cpp\mapcontent" -Destination ".\release\mapcontent" -Recurse -Force
           Compress-Archive -Path release\* -DestinationPath DayZ-DMA.zip
 
+      # ---------------------------
+      # 9️⃣ Publish Release
+      # ---------------------------
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.bump.outputs.new_tag }}
+          name: "Release ${{ steps.bump.outputs.new_tag }}"
           files: DayZ-DMA.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
