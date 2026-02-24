@@ -52,23 +52,26 @@ jobs:
       - name: Build Solution
         run: msbuild dma-dayz-cpp.sln /p:Configuration=Release
 
-      # 7️⃣ Package EXE + mapcontent into ZIP
+      # 7️⃣ Package all build files + mapcontent into ZIP
       - name: Package Build
         shell: powershell
         run: |
           mkdir release
-          # Copy the compiled DayZ-DMA.exe
-          Copy-Item -Path ".\x64\Release\*.exe" -Destination ".\release" -Force
+      
+          # Copy all files from x64\Release
+          Copy-Item -Path ".\x64\Release\*" -Destination ".\release" -Recurse -Force
+      
           # Copy the mapcontent folder
           Copy-Item -Path ".\dma-dayz-cpp\mapcontent" -Destination ".\release\mapcontent" -Recurse -Force
-          # Compress into ZIP
+      
+          # Create ZIP
           Compress-Archive -Path release\* -DestinationPath DayZ-DMA.zip
-
-      # 8️⃣ Upload ZIP to GitHub Release
-      - name: Upload to GitHub Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create v${{ steps.nbgv.outputs.SemVer2 }} DayZ-DMA.zip `
-            --title "DayZ-DMA ${{ steps.nbgv.outputs.SemVer2 }}" `
-            --notes "Automated release from GitHub Actions."
+      
+            # 8️⃣ Upload ZIP to GitHub Release
+            - name: Upload to GitHub Release
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                gh release create v${{ steps.nbgv.outputs.SemVer2 }} DayZ-DMA.zip `
+                  --title "DayZ-DMA ${{ steps.nbgv.outputs.SemVer2 }}" `
+                  --notes "Automated release from GitHub Actions."
