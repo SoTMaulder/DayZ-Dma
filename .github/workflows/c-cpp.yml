@@ -27,18 +27,26 @@ jobs:
           choco install -y 7zip
           7z x mapcontent.rar -aoa -o"dma-dayz-cpp"
 
-      # ⭐ Build the Visual Studio solution
+     # ⭐ Build the Visual Studio solution
       - name: Build Solution
         run: msbuild dma-dayz-cpp.sln /p:Configuration=Release
 
-      # ⭐ Package the final .exe into a zip file
+      # ⭐ Package .exe + mapcontent into a ZIP
       - name: Package Build
         run: |
           mkdir release
-          copy /Y "**\\Release\\*.exe" release
-          powershell Compress-Archive -Path release\* -DestinationPath DayZ-DMA.zip
 
-      # ⭐ Upload the result as a GitHub Release
+          # Copy exe file(s)
+          Copy-Item -Path ".\dma-dayz-cpp\Release\*.exe" -Destination ".\release" -Force
+
+          # Copy mapcontent folder
+          Copy-Item -Path ".\dma-dayz-cpp\mapcontent" -Destination ".\release\mapcontent" -Recurse -Force
+
+          # Build ZIP archive
+          powershell Compress-Archive -Path release\* -DestinationPath DayZ-DMA.zip
+        shell: powershell
+
+      # ⭐ Upload the ZIP as a GitHub Release asset
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
