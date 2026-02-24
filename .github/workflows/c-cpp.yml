@@ -16,19 +16,30 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
 
+      # Step 1: Download the map .rar
+      - name: Download Map Content
+        run: |
+          curl -L -o mapcontent.rar "https://www.mediafire.com/file/rdl3bs5lc8jk1ym/mapcontent.rar/file"
+      
+      # Step 2: Extract the .rar
+      - name: Extract Map Content
+        run: |
+          choco install -y 7zip
+          7z x mapcontent.rar -oMaps
+
+      # Step 3: Build your Visual Studio solution
       - name: Build Solution
         run: msbuild dma-dayz-cpp.sln /p:Configuration=Release
 
-      - name: Find Executable
-        run: |
-          dir /s /b *.exe
-
-      - name: Package .exe
+      # Step 4: Package .exe + maps
+      - name: Package Build
         run: |
           mkdir release
           copy /Y "**\\Release\\*.exe" release
+          xcopy /E /I Maps release\Maps
           powershell Compress-Archive -Path release\* -DestinationPath DayZ-DMA.zip
 
+      # Step 5: Create GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
