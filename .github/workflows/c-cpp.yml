@@ -54,13 +54,17 @@ jobs:
           Write-Output "new_tag=$new_tag" | Out-File -FilePath "$env:GITHUB_OUTPUT" -Encoding utf8 -Append
 
       # ---------------------------
-      # 4️⃣ Push new tag
+      # 4️⃣ Push new tag (using GITHUB_TOKEN)
       # ---------------------------
       - name: Push new tag
         shell: powershell
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
+          # Use token to push
+          git remote set-url origin https://x-access-token:$env:GITHUB_TOKEN@github.com/${{ github.repository }}.git
           git tag ${{ steps.bump.outputs.new_tag }}
           git push origin ${{ steps.bump.outputs.new_tag }}
 
