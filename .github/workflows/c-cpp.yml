@@ -16,37 +16,37 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
 
-      # ⭐ Download the map content .rar (use REAL direct link)
+      # ⭐ Download mapcontent.rar from your GitHub Release
       - name: Download MapContent
         run: |
           curl -L -o mapcontent.rar "https://github.com/SoTMaulder/DayZ-Dma/releases/download/MapRelease/mapcontent.rar"
 
-      # ⭐ Extract mapcontent into dma-dayz-cpp/ (not mapcontent/mapcontent)
+      # ⭐ Extract mapcontent to dma-dayz-cpp/
       - name: Extract MapContent
         run: |
           choco install -y 7zip
           7z x mapcontent.rar -aoa -o"dma-dayz-cpp"
 
-     # ⭐ Build the Visual Studio solution
+      # ⭐ Build the Visual Studio solution (Release, x64)
       - name: Build Solution
         run: msbuild dma-dayz-cpp.sln /p:Configuration=Release
 
       # ⭐ Package .exe + mapcontent into a ZIP
       - name: Package Build
+        shell: powershell
         run: |
           mkdir release
 
-          # Copy exe file(s)
-          Copy-Item -Path ".\dma-dayz-cpp\Release\*.exe" -Destination ".\release" -Force
+          # Copy actual built EXE (your correct build path)
+          Copy-Item -Path ".\x64\Release\*.exe" -Destination ".\release" -Force
 
-          # Copy mapcontent folder
+          # Include mapcontent folder
           Copy-Item -Path ".\dma-dayz-cpp\mapcontent" -Destination ".\release\mapcontent" -Recurse -Force
 
-          # Build ZIP archive
-          powershell Compress-Archive -Path release\* -DestinationPath DayZ-DMA.zip
-        shell: powershell
+          # Create final zip
+          Compress-Archive -Path release\* -DestinationPath DayZ-DMA.zip
 
-      # ⭐ Upload the ZIP as a GitHub Release asset
+      # ⭐ Upload ZIP to GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
