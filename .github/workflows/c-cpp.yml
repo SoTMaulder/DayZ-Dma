@@ -3,7 +3,7 @@ name: Build & Release DayZ-DMA
 on:
   push:
     branches:
-      - main  # change if your default branch is different
+      - main  # Change if your default branch is different
     paths:
       - 'dma-dayz-cpp/**'
   workflow_dispatch:
@@ -56,7 +56,7 @@ jobs:
       - name: Package Build
         shell: powershell
         run: |
-          mkdir release
+          New-Item -ItemType Directory -Path "release" -Force
       
           # Copy all files from x64\Release
           Copy-Item -Path ".\x64\Release\*" -Destination ".\release" -Recurse -Force
@@ -66,12 +66,16 @@ jobs:
       
           # Create ZIP
           Compress-Archive -Path release\* -DestinationPath DayZ-DMA.zip
-      
-            # 8️⃣ Upload ZIP to GitHub Release
-            - name: Upload to GitHub Release
-              env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                gh release create v${{ steps.nbgv.outputs.SemVer2 }} DayZ-DMA.zip `
-                  --title "DayZ-DMA ${{ steps.nbgv.outputs.SemVer2 }}" `
-                  --notes "Automated release from GitHub Actions."
+
+      # 8️⃣ Install GitHub CLI
+      - name: Install GitHub CLI
+        run: choco install gh -y
+
+      # 9️⃣ Upload ZIP to GitHub Release
+      - name: Upload to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create v${{ steps.nbgv.outputs.SemVer2 }} DayZ-DMA.zip `
+            --title "DayZ-DMA ${{ steps.nbgv.outputs.SemVer2 }}" `
+            --notes "Automated release from GitHub Actions."
