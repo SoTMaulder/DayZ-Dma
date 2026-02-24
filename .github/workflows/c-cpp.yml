@@ -3,25 +3,31 @@ name: Build & Auto-Release DayZ-Dma
 on:
   push:
     branches:
-      - main   # or your default branch
+      - main  # Or your default branch
   workflow_dispatch:
 
 jobs:
   build_windows:
     runs-on: windows-latest
     env:
-      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}   # Personal Access Token with repo scope
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}  # <-- Your PAT token secret
 
     steps:
       # ---------------------------
-      # 1️⃣ Checkout repo
+      # 1️⃣ Checkout repo with full history (needed for tags)
       # ---------------------------
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # needed to see all tags
+          fetch-depth: 0
 
       # ---------------------------
-      # 2️⃣ Get latest semver tag
+      # 2️⃣ Setup MSBuild
+      # ---------------------------
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+
+      # ---------------------------
+      # 3️⃣ Get latest semver tag
       # ---------------------------
       - name: Get latest semver tag
         id: get_tag
@@ -33,7 +39,7 @@ jobs:
           Write-Output "latest_tag=$latest" | Out-File -FilePath "$env:GITHUB_OUTPUT" -Encoding utf8 -Append
 
       # ---------------------------
-      # 3️⃣ Bump patch version
+      # 4️⃣ Bump patch version
       # ---------------------------
       - name: Bump patch version
         id: bump
@@ -49,22 +55,17 @@ jobs:
           Write-Output "new_tag=$new_tag" | Out-File -FilePath "$env:GITHUB_OUTPUT" -Encoding utf8 -Append
 
       # ---------------------------
-      # 4️⃣ Push new tag using PAT
+      # 5️⃣ Push new tag using PAT
       # ---------------------------
       - name: Push new tag
         shell: powershell
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
+          git fetch --prune --unshallow
           git remote set-url origin https://$env:PAT_TOKEN@github.com/${{ github.repository }}.git
           git tag ${{ steps.bump.outputs.new_tag }}
           git push origin ${{ steps.bump.outputs.new_tag }}
-
-      # ---------------------------
-      # 5️⃣ Setup MSBuild
-      # ---------------------------
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1
 
       # ---------------------------
       # 6️⃣ Download mapcontent.rar
@@ -82,7 +83,7 @@ jobs:
           7z x mapcontent.rar -aoa -o"dma-dayz-cpp"
 
       # ---------------------------
-      # 8️⃣ Build solution
+      # 8️⃣ Build solution (Release x64)
       # ---------------------------
       - name: Build Solution
         run: msbuild dma-dayz-cpp.sln /p:Configuration=Release
@@ -99,7 +100,7 @@ jobs:
           Compress-Archive -Path release\* -DestinationPath DayZ-DMA.zip
 
       # ---------------------------
-      # 🔟 Create GitHub Release
+      # 🔟 Upload ZIP as GitHub Release
       # ---------------------------
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
