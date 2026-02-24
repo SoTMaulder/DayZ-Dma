@@ -1,95 +1,29 @@
-name: Build & Auto-Release DayZ-Dma
+name: Build & Release DayZ-DMA
 
 on:
-  push:
-    branches:
-      - main  # Or your default branch
-  workflow_dispatch:
+  workflow_dispatch:   # manual trigger for now
 
 jobs:
-  build_windows:
+  build:
     runs-on: windows-latest
     env:
-      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}  # <-- Your PAT token secret
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
 
     steps:
-      # ---------------------------
-      # 1️⃣ Checkout repo with full history (needed for tags)
-      # ---------------------------
+      # 1️⃣ Checkout full repo
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # ---------------------------
       # 2️⃣ Setup MSBuild
-      # ---------------------------
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
 
-      # ---------------------------
-      # 3️⃣ Get latest semver tag
-      # ---------------------------
-      - name: Get latest semver tag
-        id: get_tag
-        shell: powershell
-        run: |
-          $tags = git tag --list "v*"
-          if ($tags.Count -eq 0) { $latest = "v0.0.0" }
-          else { $latest = $tags | Sort-Object {[version]($_.TrimStart('v'))} -Descending | Select-Object -First 1 }
-          Write-Output "latest_tag=$latest" | Out-File -FilePath "$env:GITHUB_OUTPUT" -Encoding utf8 -Append
-
-      # ---------------------------
-      # 4️⃣ Bump patch version
-      # ---------------------------
-      - name: Bump patch version
-        id: bump
-        shell: powershell
-        run: |
-          $old = "${{ steps.get_tag.outputs.latest_tag }}"
-          $old = $old.TrimStart('v')
-          $parts = $old.Split('.')
-          $major = [int]$parts[0]
-          $minor = [int]$parts[1]
-          $patch = [int]$parts[2] + 1
-          $new_tag = "v$major.$minor.$patch"
-          Write-Output "new_tag=$new_tag" | Out-File -FilePath "$env:GITHUB_OUTPUT" -Encoding utf8 -Append
-
-      # ---------------------------
-      # 5️⃣ Push new tag using PAT
-      # ---------------------------
-      - name: Push new tag
-        shell: powershell
-        run: |
-          git config user.email "actions@github.com"
-          git config user.name "GitHub Actions"
-          git remote set-url origin https://$env:PAT_TOKEN@github.com/${{ github.repository }}.git
-          git tag ${{ steps.bump.outputs.new_tag }}
-          git push origin ${{ steps.bump.outputs.new_tag }}
-
-      # ---------------------------
-      # 6️⃣ Download mapcontent.rar
-      # ---------------------------
-      - name: Download MapContent
-        run: |
-          curl -L -o mapcontent.rar "https://github.com/SoTMaulder/DayZ-Dma/releases/download/MapRelease/mapcontent.rar"
-
-      # ---------------------------
-      # 7️⃣ Extract mapcontent
-      # ---------------------------
-      - name: Extract MapContent
-        run: |
-          choco install -y 7zip
-          7z x mapcontent.rar -aoa -o"dma-dayz-cpp"
-
-      # ---------------------------
-      # 8️⃣ Build solution (Release x64)
-      # ---------------------------
+      # 3️⃣ Build solution (Release x64)
       - name: Build Solution
         run: msbuild dma-dayz-cpp.sln /p:Configuration=Release
 
-      # ---------------------------
-      # 9️⃣ Package EXE + mapcontent into ZIP
-      # ---------------------------
+      # 4️⃣ Package EXE + mapcontent
       - name: Package Build
         shell: powershell
         run: |
@@ -98,14 +32,12 @@ jobs:
           Copy-Item -Path ".\dma-dayz-cpp\mapcontent" -Destination ".\release\mapcontent" -Recurse -Force
           Compress-Archive -Path release\* -DestinationPath DayZ-DMA.zip
 
-      # ---------------------------
-      # 🔟 Upload ZIP as GitHub Release
-      # ---------------------------
-      - name: Create GitHub Release
+      # 5️⃣ Create GitHub Release (manual tag for now)
+      - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.bump.outputs.new_tag }}
-          name: "Release ${{ steps.bump.outputs.new_tag }}"
+          tag_name: v0.0.1        # We will auto-bump later
+          name: "Release v0.0.1"
           files: DayZ-DMA.zip
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
