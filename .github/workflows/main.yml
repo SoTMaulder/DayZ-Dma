@@ -2,7 +2,8 @@ name: Deploy to GitHub Releases
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
     paths:
       - 'Resources/**'
       - 'src/**'
@@ -10,7 +11,7 @@ on:
 
 permissions:
   contents: write
-  
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -35,21 +36,33 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: "10.0.x"
-
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
+          dotnet-version: "8.0.x"
 
       - name: Install Velopack CLI
         run: dotnet tool install -g vpk
 
-      - name: Build C++ Solution (MSBuild)
+      - name: Restore NuGet packages
+        run: dotnet restore dma-dayz-cpp.sln
+
+      - name: Build with MSBuild
         run: |
-          msbuild dma-dayz-cpp.sln ^
-            /t:Build ^
-            /p:Configuration=Release ^
-            /p:Platform=x64 ^
-            /p:OutDir="$(Build.SourcesDirectory)\out\\"
+          msbuild "dma-dayz-cpp.sln" `
+            /t:Build `
+            /p:Configuration=Release `
+            /p:Platform="x64"
+
+      - name: Dotnet Publish
+        run: |
+          dotnet publish dma-dayz-cpp.sln `
+            -c Release `
+            -r win-x64 `
+            --self-contained `
+            /p:DebugType=None `
+            /p:DebugSymbols=false `
+            /p:Version=${{ steps.nbgv.outputs.SemVer2 }} `
+            /p:FileVersion=${{ steps.nbgv.outputs.AssemblyFileVersion }} `
+            /p:AssemblyVersion=${{ steps.nbgv.outputs.AssemblyVersion }} `
+            -o out
 
       - name: Download previous release data
         env:
